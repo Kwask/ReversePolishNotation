@@ -8,10 +8,5 @@ public class Operator
 		left_associativity = assoc;
 		operator = op;
 	}
-
-	static public void main()
-	{
-
-	}	
 }
 
