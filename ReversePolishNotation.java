@@ -5,11 +5,11 @@ import java.util.Stack;
 
 public class ReversePolishNotation
 {
-	private static Operator operators[] = { new Operator( false, '^' ),
-											new Operator( true, '*' ),
-											new Operator( true, '/' ),
-											new Operator( true, '+' ),
-											new Operator( true, '-' ) };
+	private static Operator all_operators[] = { new Operator( false, '^', 4 ),
+												new Operator( true, '*', 3 ),
+												new Operator( true, '/', 3 ),
+												new Operator( true, '+', 2 ),
+												new Operator( true, '-', 2 ) };
 
 	public static void main( String[] args ) 
 	{
@@ -18,11 +18,20 @@ public class ReversePolishNotation
 		String input = scanner.next();
 		
 		List<String> tokens = tokenize( input );
-
+		System.out.print( "Input: \t" );
 		for( String token : tokens )
 		{
-			System.out.print( token + "\n" );
+			System.out.print( token + " " );
 		}
+		System.out.print( "\n" );
+
+		tokens = shuntingYard( tokens );
+		System.out.print( "RPN: \t" );
+		for( String token : tokens )
+		{
+			System.out.print( token + " " );
+		}
+		System.out.print( "\n" );
 	}
 
 	private static List<String> shuntingYard( List<String> tokens )
@@ -40,8 +49,36 @@ public class ReversePolishNotation
 
 			if( isOperator( token ))
 			{
-				return output;
+				Operator cur_operator = getOperator( token );
+
+				int operators_size = operators.size();
+				for( int i = 0; i < operators_size; i++ )
+				{
+					if( operators.peek() == null )
+						break;
+
+					Operator top_operator = getOperator( operators.peek() );
+
+					if(( cur_operator.left_assoc && cur_operator.precedence <= top_operator.precedence ) ||
+					   ( !cur_operator.left_assoc && cur_operator.precedence < top_operator.precedence ))
+					{
+						operators.pop();
+						output.add( Character.toString( top_operator.operator ));
+					}
+					else
+					{
+						break;
+					}
+				}
+				
+				operators.push( token );
 			}
+		}
+
+		while( !operators.empty() )
+		{
+			String cur_operator = operators.pop();
+			output.add( cur_operator );
 		}
 
 		return output;
@@ -63,7 +100,6 @@ public class ReversePolishNotation
 				token += character;
 			}
 
-			// Add it to our return list
 			if( isOperator( character ) || i == input.length()-1 )
 			{
 				if( token.length() > 0 )
@@ -85,7 +121,7 @@ public class ReversePolishNotation
 
 	private static boolean isOperator( char character )
 	{
-		for( Operator operator : operators )
+		for( Operator operator : all_operators )
 		{
 			if( operator.operator == character )
 			{
@@ -136,4 +172,21 @@ public class ReversePolishNotation
 		return true;
 	}
 
+	private static Operator getOperator( char character )
+	{
+		for( Operator operator : all_operators )
+		{
+			if( operator.operator == character )
+			{
+				return operator;
+			}
+		}
+
+		return null;
+	}
+
+	private static Operator getOperator( String character )
+	{
+		return getOperator( character.charAt( 0 ) );
+	}
 }
