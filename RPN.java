@@ -1,10 +1,15 @@
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class RPN 
 {
-	static char operators[] = {'+', '-', '*', '/', '(', ')' };
+	private static Operator operators[] = { new Operator( false, '^' ),
+											new Operator( true, '*' ),
+											new Operator( true, '/' ),
+											new Operator( true, '+' ),
+											new Operator( true, '-' ) };
 
 	public static void main( String[] args ) 
 	{
@@ -19,7 +24,15 @@ public class RPN
 			System.out.print( token + "\n" );
 		}
 	}
-	
+
+	private static List<String> shuntingYard( String input )
+	{
+		List<String> output = new ArrayList<String>();
+		List<String> operators = new ArrayList<String>();
+
+		return output;
+	}
+
 	private static List<String> tokenize( String input )
 	{
 		// List because it needs to dynamically add tokens
@@ -58,9 +71,9 @@ public class RPN
 
 	private static boolean isOperator( char character )
 	{
-		for( char operator : operators )
+		for( Operator operator : operators )
 		{
-			if( operator == character )
+			if( operator.operator == character )
 			{
 				return true;
 			}
