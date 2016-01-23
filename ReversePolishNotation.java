@@ -5,17 +5,17 @@ import java.util.Stack;
 
 public class ReversePolishNotation
 {
-	private static Operator all_operators[] = { new Operator( false, '^', 4 ),
-												new Operator( true, '*', 3 ),
-												new Operator( true, '/', 3 ),
-												new Operator( true, '+', 2 ),
-												new Operator( true, '-', 2 ) };
+	private static Operator all_operators[] = { new Power(),
+												new Multiply(),
+												new Division(),
+												new Addition(),
+												new Subtract() };
 
 	public static void main( String[] args ) 
 	{
 		Scanner scanner = new Scanner( System.in );
 		System.out.print( "Enter an equation: " );
-		String input = scanner.next();
+		String input = scanner.nextLine();
 		
 		List<String> tokens = tokenize( input );
 		System.out.print( "Input: \t" );
@@ -59,11 +59,11 @@ public class ReversePolishNotation
 
 					Operator top_operator = getOperator( operators.peek() );
 
-					if(( cur_operator.left_assoc && cur_operator.precedence <= top_operator.precedence ) ||
-					   ( !cur_operator.left_assoc && cur_operator.precedence < top_operator.precedence ))
+					if(( cur_operator.isLeftAssoc() && cur_operator.getPrec() <= top_operator.getPrec() ) ||
+					   ( !cur_operator.isLeftAssoc() && cur_operator.getPrec() < top_operator.getPrec() ))
 					{
 						operators.pop();
-						output.add( Character.toString( top_operator.operator ));
+						output.add( Character.toString( top_operator.getOp() ));
 					}
 					else
 					{
@@ -90,7 +90,6 @@ public class ReversePolishNotation
 		List<String> tokens = new ArrayList<String>();
 		
 		String token = "";
-		
 		for( int i = 0; i < input.length(); i++ )
 		{	
 			char character = input.charAt( i );
@@ -99,8 +98,8 @@ public class ReversePolishNotation
 			{
 				token += character;
 			}
-
-			if( isOperator( character ) || i == input.length()-1 )
+			
+			if( isOperator( character ) || ( isNumber( character ) && i == input.length()-1 ))
 			{
 				if( token.length() > 0 )
 				{
@@ -123,7 +122,7 @@ public class ReversePolishNotation
 	{
 		for( Operator operator : all_operators )
 		{
-			if( operator.operator == character )
+			if( operator.getOp() == character )
 			{
 				return true;
 			}
@@ -176,7 +175,7 @@ public class ReversePolishNotation
 	{
 		for( Operator operator : all_operators )
 		{
-			if( operator.operator == character )
+			if( operator.getOp() == character )
 			{
 				return operator;
 			}

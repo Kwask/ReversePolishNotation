@@ -1,14 +1,25 @@
-public class Operator
+abstract public class Operator
 {
-	public boolean left_assoc;
-	public char operator;
-	public int precedence;
+	private boolean left_assoc;
+	private char operator;
+	private int precedence;
 
-	Operator( boolean assoc, char op, int prec )
+	abstract public double operate( double A, double B );
+
+	public boolean isLeftAssoc()
 	{
-		left_assoc = assoc;
-		operator = op;
-		precedence = prec;
+		return left_assoc;
 	}
+
+	public char getOp()
+	{
+		return operator;
+	}
+
+	public int getPrec()
+	{
+		return precedence;
+	}
+
 }
 
