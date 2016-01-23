@@ -9,7 +9,9 @@ public class ReversePolishNotation
 												new Multiply(),
 												new Division(),
 												new Addition(),
-												new Subtract() };
+												new Subtract(),
+												new ParanLeft(),
+												new ParanRight() };
 
 	public static void main( String[] args ) 
 	{
@@ -73,7 +75,7 @@ public class ReversePolishNotation
 	private static List<String> shuntingYard( List<String> tokens )
 	{
 		List<String> output = new ArrayList<String>();
-		Stack<String> operators = new Stack<String>();
+		Stack<Operator> operators = new Stack<Operator>();
 
 		for( String token : tokens )
 		{
@@ -87,34 +89,84 @@ public class ReversePolishNotation
 			{
 				Operator cur_operator = getOperator( token );
 
+				System.out.print( "PROCESS: " + Character.toString( cur_operator.getOp() ) + "\n" );
+
+				// Righthand paranthesis will push everything on
+				// the stack to output until a lefthand paran has been recieved
+				if( cur_operator.getOp() == ')' )
+				{
+					try
+					{
+						Operator top_operator = operators.pop();
+						System.out.print( "STACK: Popped " + Character.toString( top_operator.getOp() ) + "\n" );
+
+						while( top_operator.getOp() != '(' )
+						{
+							if( top_operator.canOperate() )
+							{
+								output.add( Character.toString( top_operator.getOp() ));
+								System.out.print( "QUEUE: Added " + Character.toString( top_operator.getOp() ) + "\n" );
+							}
+								
+							if( operators.empty() )
+							{
+								break;
+							}
+							top_operator = operators.pop();
+							System.out.print( "STACK: Popped " + Character.toString( top_operator.getOp() ) + "\n" );
+						}
+					}
+					catch( NumberFormatException error )
+					{
+						System.out.print( "Could not find lefthand paranthesis" );
+						return null;
+					}
+					continue;
+				}
+
 				int operators_size = operators.size();
 				for( int i = 0; i < operators_size; i++ )
 				{
 					if( operators.peek() == null )
 						break;
 
-					Operator top_operator = getOperator( operators.peek() );
+					Operator top_operator = operators.peek();
 
-					if(( cur_operator.isLeftAssoc() && cur_operator.getPrec() <= top_operator.getPrec() ) ||
-					   ( !cur_operator.isLeftAssoc() && cur_operator.getPrec() < top_operator.getPrec() ))
+					// Adding the operator to the output
+					if( ( cur_operator.canOperate() && top_operator.canOperate() ) &&
+					    (( cur_operator.isLeftAssoc() && cur_operator.getPrec() <= top_operator.getPrec() ) ||
+					    ( !cur_operator.isLeftAssoc() && cur_operator.getPrec() < top_operator.getPrec() )))
 					{
-						operators.pop();
-						output.add( Character.toString( top_operator.getOp() ));
+						top_operator = operators.pop();
+						System.out.print( "STACK: Popped " + Character.toString( top_operator.getOp() ) + "\n" );
+
+						if( top_operator.canOperate() )
+						{
+							output.add( Character.toString( top_operator.getOp() ));
+							System.out.print( "QUEUE: Added " + Character.toString( top_operator.getOp() ) + "\n" );
+						}
 					}
 					else
 					{
 						break;
 					}
 				}
-				
-				operators.push( token );
+					
+				operators.push( cur_operator );
+				System.out.print( "STACK: Added " + Character.toString( cur_operator.getOp() ) + "\n" );
 			}
 		}
 
+		System.out.print( "PROCESS: Moving stack to queue\n" );
 		while( !operators.empty() )
 		{
-			String cur_operator = operators.pop();
-			output.add( cur_operator );
+			Operator cur_operator = operators.pop();
+			System.out.print( "STACK: Popped " + Character.toString( cur_operator.getOp() ) + "\n" );
+			if( cur_operator.canOperate() )
+			{
+				output.add( Character.toString( cur_operator.getOp() ));
+				System.out.print( "QUEUE: Added " + Character.toString( cur_operator.getOp() ) + "\n" );
+			}
 		}
 
 		return output;

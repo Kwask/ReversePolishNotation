@@ -1,13 +1,13 @@
-public class Subtract extends Operator
+public class ParanLeft extends Operator
 {
-	private char operator = '-';
+	private char operator = '(';
 	private boolean left_assoc = true;
-	private boolean can_operate = true;
-	private int precedence = 2;
+	private boolean can_operate = false;
+	private int precedence = 10;
 
 	public double operate( double A, double B )
 	{
-		return A-B;
+		return 0.0;
 	}
 
 	public boolean canOperate()
