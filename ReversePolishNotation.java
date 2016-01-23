@@ -32,6 +32,42 @@ public class ReversePolishNotation
 			System.out.print( token + " " );
 		}
 		System.out.print( "\n" );
+
+		double result = evaluate( tokens );
+		System.out.print( "Result: " + Double.toString( result ) + "\n" );
+	}
+
+	private static double evaluate( List<String> tokens )
+	{
+		Stack<Double> stack = new Stack<Double>();
+
+		for( String token : tokens )
+		{
+			if( isNumber( token ))
+			{
+				double digit = Double.parseDouble( token );
+				stack.push( digit );
+				continue;
+			}
+
+			if( isOperator( token ))
+			{
+				try
+				{
+					Operator cur_operator = getOperator( token );
+					double digit_B = stack.pop();
+					double digit_A = stack.pop();
+					
+					stack.push( cur_operator.operate( digit_A, digit_B ));
+				}
+				catch( NumberFormatException error )
+				{
+					System.out.print( "Invalid expression" );
+				}
+			}
+		}
+
+		return stack.pop();
 	}
 
 	private static List<String> shuntingYard( List<String> tokens )
